@@ -12,7 +12,8 @@ router.get("/", async (req, res) => {
     const limit = parseInt(req.query.limit);
     const songs = await Song.find()
       .limit(limit)
-      .skip((page - 1) * limit);
+      .skip((page - 1) * limit)
+      .populate("artist");
 
     // Num total de elementos
     const totalElements = await Song.countDocuments();
@@ -35,7 +36,7 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const id = req.params.id;
-    const song = await Song.findById(id);
+    const song = await Song.findById(id).populate("artist");
     if (song) {
       res.json(song);
     } else {
@@ -51,7 +52,7 @@ router.get("/title/:title", async (req, res) => {
   const title = req.params.title;
 
   try {
-    const song = await Song.find({ title: new RegExp("^" + title.toLowerCase(), "i") });
+    const song = await Song.find({ title: new RegExp("^" + title.toLowerCase(), "i") }).populate("artist");
     if (song?.length) {
       res.json(song);
     } else {
